@@ -4,30 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using NakedObjects;
 
 namespace OOPRecords.Model
 {
     public class StudentRepository
     {
-        private DatabaseContext Context;
+        public IDomainObjectContainer Container { set; protected get; }
 
-        public StudentRepository(DatabaseContext context)
+        public IQueryable<Student> AllStudents()
         {
-            Context = context;
+            return Container.Instances<Student>();
         }
 
-        public void Add(Student s)
-        {
-            Context.Students.Add(s);
-            Context.SaveChanges();
-        }
-
-        public IEnumerable<Student> AllStudents()
-        {
-            return Context.Students;
-        }
-
-        public IEnumerable<Student> FindStudentByLastName(string lastName)
+        public IQueryable<Student> FindStudentByLastName(string lastName)
         {
             return from s in AllStudents()
                    where s.LastName.ToUpper().Contains(lastName.ToUpper())
@@ -36,11 +26,11 @@ namespace OOPRecords.Model
 
         public Student NewStudent(string firstName, string lastName, DateTime dob)
         {
-            var s = new Student();
+            var s = Container.NewTransientInstance<Student>();
             s.FirstName = firstName;
             s.LastName = lastName;
             s.DateOfBirth = dob;
-            Add(s);
+            Container.Persist(ref s);
             return s;
         }
     }

@@ -14,6 +14,7 @@ namespace OOPRecords.Model
             Database.SetInitializer(new Initializer());
         }
         
+        public DbSet<Teacher> Teachers { get; set; }    
         public DbSet<Student> Students { get; set; }
     }
 }
